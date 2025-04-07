@@ -1,0 +1,617 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Math Questions Generator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            text-align: center;
+            background-color: #f5f5f5;
+        }
+        h1 {
+            color: #2c3e50;
+        }
+        .controls {
+            margin: 20px 0;
+            padding: 20px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+        .control-group {
+            text-align: left;
+            padding: 10px;
+        }
+        .question-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .question-box {
+            background-color: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: left;
+            position: relative;
+        }
+        .question {
+            font-size: 18px;
+            margin-bottom: 15px;
+            font-family: 'Courier New', monospace;
+        }
+        input[type="number"], input[type="text"] {
+            width: 100px;
+            padding: 8px;
+            font-size: 16px;
+        }
+        button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px 5px;
+            font-size: 16px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background-color: #2980b9;
+        }
+        .result {
+            font-weight: bold;
+            margin-top: 10px;
+            min-height: 24px;
+            padding: 5px;
+            border-radius: 3px;
+        }
+        .correct {
+            color: #27ae60;
+            background-color: #e8f8f0;
+        }
+        .incorrect {
+            color: #e74c3c;
+            background-color: #fdedec;
+        }
+        .stats {
+            margin-top: 30px;
+            padding: 15px;
+            background-color: #ecf0f1;
+            border-radius: 5px;
+            font-size: 18px;
+        }
+        .difficulty-selector {
+            margin: 15px 0;
+        }
+        .operation-options {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 10px;
+        }
+        .hidden {
+            display: none;
+        }
+        .division-answer {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .division-answer input {
+            width: 60px;
+        }
+        .complex-expression {
+            font-size: 20px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <h1>Advanced Math Questions Generator</h1>
+    
+    <div class="controls">
+        <div class="control-group">
+            <div class="difficulty-selector">
+                <label for="difficulty">Difficulty Level:</label>
+                <select id="difficulty">
+                    <option value="easy">Easy</option>
+                    <option value="medium" selected>Medium</option>
+                    <option value="hard">Hard</option>
+                    <option value="expert">Expert</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="questionCount">Number of questions:</label>
+                <input type="number" id="questionCount" min="1" max="20" value="10">
+            </div>
+            
+            <div>
+                <label for="negativeNumbers">
+                    <input type="checkbox" id="negativeNumbers"> Include negative numbers
+                </label>
+            </div>
+        </div>
+        
+        <div class="control-group">
+            <p>Operation Types:</p>
+            <div class="operation-options">
+                <label><input type="checkbox" id="addCheckbox" checked> Addition</label>
+                <label><input type="checkbox" id="subCheckbox" checked> Subtraction</label>
+                <label><input type="checkbox" id="mulCheckbox" checked> Multiplication</label>
+                <label><input type="checkbox" id="divCheckbox"> Division</label>
+                <label><input type="checkbox" id="mixedCheckbox"> Mixed Operations</label>
+                <label><input type="checkbox" id="orderOpsCheckbox"> Order of Operations</label>
+            </div>
+        </div>
+    </div>
+    
+    <button id="generateBtn">Generate New Questions</button>
+    <button id="checkAnswersBtn">Check Answers</button>
+    
+    <div class="question-container" id="questions"></div>
+    
+    <div class="stats">
+        <p>Correct: <span id="correctCount">0</span> | 
+           Incorrect: <span id="incorrectCount">0</span> | 
+           Total: <span id="totalCount">0</span></p>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const questionsContainer = document.getElementById('questions');
+            const generateBtn = document.getElementById('generateBtn');
+            const checkAnswersBtn = document.getElementById('checkAnswersBtn');
+            const questionCountInput = document.getElementById('questionCount');
+            const difficultySelect = document.getElementById('difficulty');
+            const negativeNumbersCheckbox = document.getElementById('negativeNumbers');
+            const addCheckbox = document.getElementById('addCheckbox');
+            const subCheckbox = document.getElementById('subCheckbox');
+            const mulCheckbox = document.getElementById('mulCheckbox');
+            const divCheckbox = document.getElementById('divCheckbox');
+            const mixedCheckbox = document.getElementById('mixedCheckbox');
+            const orderOpsCheckbox = document.getElementById('orderOpsCheckbox');
+            const correctCountSpan = document.getElementById('correctCount');
+            const incorrectCountSpan = document.getElementById('incorrectCount');
+            const totalCountSpan = document.getElementById('totalCount');
+            
+            let correctAnswers = 0;
+            let incorrectAnswers = 0;
+            let totalQuestions = 0;
+            
+            generateBtn.addEventListener('click', generateQuestions);
+            checkAnswersBtn.addEventListener('click', checkAnswers);
+            
+            function generateQuestions() {
+                questionsContainer.innerHTML = '';
+                const questionCount = parseInt(questionCountInput.value);
+                const difficulty = difficultySelect.value;
+                const includeNegatives = negativeNumbersCheckbox.checked;
+                
+                const selectedTypes = [];
+                if (addCheckbox.checked) selectedTypes.push('+');
+                if (subCheckbox.checked) selectedTypes.push('-');
+                if (mulCheckbox.checked) selectedTypes.push('*');
+                if (divCheckbox.checked) selectedTypes.push('/');
+                if (mixedCheckbox.checked) selectedTypes.push('mixed');
+                if (orderOpsCheckbox.checked) selectedTypes.push('order');
+                
+                if (selectedTypes.length === 0) {
+                    alert('Please select at least one operation type');
+                    return;
+                }
+                
+                for (let i = 0; i < questionCount; i++) {
+                    const type = selectedTypes[Math.floor(Math.random() * selectedTypes.length)];
+                    let question, answer, answerType = 'number';
+                    
+                    switch (type) {
+                        case '+':
+                            ({question, answer} = generateAddition(difficulty, includeNegatives));
+                            break;
+                        case '-':
+                            ({question, answer} = generateSubtraction(difficulty, includeNegatives));
+                            break;
+                        case '*':
+                            ({question, answer} = generateMultiplication(difficulty, includeNegatives));
+                            break;
+                        case '/':
+                            ({question, answer} = generateDivision(difficulty, includeNegatives));
+                            answerType = 'division';
+                            break;
+                        case 'mixed':
+                            ({question, answer} = generateMixedOperation(difficulty, includeNegatives));
+                            break;
+                        case 'order':
+                            ({question, answer} = generateOrderOfOperations(difficulty, includeNegatives));
+                            break;
+                    }
+                    
+                    const questionBox = document.createElement('div');
+                    questionBox.className = 'question-box';
+                    
+                    if (type === 'order' || type === 'mixed') {
+                        questionBox.innerHTML = `
+                            <div class="question complex-expression">${i+1}. ${question} = </div>
+                            <input type="number" id="answer-${i}" data-correct="${answer}">
+                            <div class="result" id="result-${i}"></div>
+                        `;
+                    } else if (answerType === 'division') {
+                        questionBox.innerHTML = `
+                            <div class="question">${i+1}. ${question} = </div>
+                            <div class="division-answer">
+                                <span>Quotient:</span> <input type="number" id="answer-${i}-q" data-part="quotient">
+                                <span>Remainder:</span> <input type="number" id="answer-${i}-r" data-part="remainder">
+                            </div>
+                            <div class="result" id="result-${i}"></div>
+                            <input type="hidden" id="answer-${i}" data-correct="${answer.quotient},${answer.remainder}">
+                        `;
+                    } else {
+                        questionBox.innerHTML = `
+                            <div class="question">${i+1}. ${question} = </div>
+                            <input type="number" id="answer-${i}" data-correct="${answer}">
+                            <div class="result" id="result-${i}"></div>
+                        `;
+                    }
+                    
+                    questionsContainer.appendChild(questionBox);
+                }
+                
+                totalQuestions = questionCount;
+                correctAnswers = 0;
+                incorrectAnswers = 0;
+                updateStats();
+            }
+            
+            function generateAddition(difficulty, includeNegatives) {
+                let a, b;
+                switch (difficulty) {
+                    case 'easy':
+                        a = getRandomInt(1, 50);
+                        b = getRandomInt(1, 50);
+                        break;
+                    case 'medium':
+                        a = getRandomInt(50, 200);
+                        b = getRandomInt(50, 200);
+                        break;
+                    case 'hard':
+                        a = getRandomInt(200, 1000);
+                        b = getRandomInt(200, 1000);
+                        break;
+                    case 'expert':
+                        a = getRandomInt(1000, 10000);
+                        b = getRandomInt(1000, 10000);
+                        break;
+                }
+                
+                if (includeNegatives && Math.random() > 0.5) a *= -1;
+                if (includeNegatives && Math.random() > 0.5) b *= -1;
+                
+                return {
+                    question: `${a} + ${b}`,
+                    answer: a + b
+                };
+            }
+            
+            function generateSubtraction(difficulty, includeNegatives) {
+                let a, b;
+                switch (difficulty) {
+                    case 'easy':
+                        a = getRandomInt(1, 50);
+                        b = getRandomInt(1, a);
+                        break;
+                    case 'medium':
+                        a = getRandomInt(50, 200);
+                        b = getRandomInt(1, a);
+                        break;
+                    case 'hard':
+                        a = getRandomInt(200, 1000);
+                        b = getRandomInt(1, a);
+                        break;
+                    case 'expert':
+                        a = getRandomInt(1000, 10000);
+                        b = getRandomInt(1, a);
+                        break;
+                }
+                
+                if (includeNegatives && Math.random() > 0.5) a *= -1;
+                if (includeNegatives && Math.random() > 0.5) b *= -1;
+                
+                // For negative results, sometimes reverse the operation
+                if (includeNegatives && Math.random() > 0.7) {
+                    return {
+                        question: `${b} - ${a}`,
+                        answer: b - a
+                    };
+                }
+                
+                return {
+                    question: `${a} - ${b}`,
+                    answer: a - b
+                };
+            }
+            
+            function generateMultiplication(difficulty, includeNegatives) {
+                let a, b;
+                switch (difficulty) {
+                    case 'easy':
+                        a = getRandomInt(1, 12);
+                        b = getRandomInt(1, 12);
+                        break;
+                    case 'medium':
+                        a = getRandomInt(5, 25);
+                        b = getRandomInt(5, 25);
+                        break;
+                    case 'hard':
+                        a = getRandomInt(10, 50);
+                        b = getRandomInt(10, 50);
+                        break;
+                    case 'expert':
+                        a = getRandomInt(25, 100);
+                        b = getRandomInt(25, 100);
+                        break;
+                }
+                
+                if (includeNegatives && Math.random() > 0.5) a *= -1;
+                if (includeNegatives && Math.random() > 0.5) b *= -1;
+                
+                return {
+                    question: `${a} × ${b}`,
+                    answer: a * b
+                };
+            }
+            
+            function generateDivision(difficulty, includeNegatives) {
+                let a, b;
+                switch (difficulty) {
+                    case 'easy':
+                        b = getRandomInt(1, 12);
+                        a = b * getRandomInt(1, 12);
+                        break;
+                    case 'medium':
+                        b = getRandomInt(1, 25);
+                        a = b * getRandomInt(1, 25);
+                        break;
+                    case 'hard':
+                        b = getRandomInt(5, 50);
+                        a = b * getRandomInt(5, 50);
+                        break;
+                    case 'expert':
+                        b = getRandomInt(10, 100);
+                        a = b * getRandomInt(10, 100);
+                        break;
+                }
+                
+                // Sometimes add a remainder
+                if (Math.random() > 0.7) {
+                    const remainder = getRandomInt(1, b - 1);
+                    a += remainder;
+                    
+                    if (includeNegatives && Math.random() > 0.5) a *= -1;
+                    if (includeNegatives && Math.random() > 0.5) b *= -1;
+                    
+                    const quotient = Math.floor(a / b);
+                    const actualRemainder = a % b;
+                    
+                    return {
+                        question: `${a} ÷ ${b}`,
+                        answer: {
+                            quotient: quotient,
+                            remainder: actualRemainder
+                        }
+                    };
+                }
+                
+                if (includeNegatives && Math.random() > 0.5) a *= -1;
+                if (includeNegatives && Math.random() > 0.5) b *= -1;
+                
+                return {
+                    question: `${a} ÷ ${b}`,
+                    answer: {
+                        quotient: a / b,
+                        remainder: 0
+                    }
+                };
+            }
+            
+            function generateMixedOperation(difficulty, includeNegatives) {
+                const operations = ['+', '-', '*'];
+                const op1 = operations[Math.floor(Math.random() * operations.length)];
+                const op2 = operations[Math.floor(Math.random() * operations.length)];
+                
+                let a, b, c;
+                switch (difficulty) {
+                    case 'easy':
+                        a = getRandomInt(1, 20);
+                        b = getRandomInt(1, 20);
+                        c = getRandomInt(1, 20);
+                        break;
+                    case 'medium':
+                        a = getRandomInt(10, 50);
+                        b = getRandomInt(10, 50);
+                        c = getRandomInt(10, 50);
+                        break;
+                    case 'hard':
+                        a = getRandomInt(25, 100);
+                        b = getRandomInt(25, 100);
+                        c = getRandomInt(25, 100);
+                        break;
+                    case 'expert':
+                        a = getRandomInt(50, 200);
+                        b = getRandomInt(50, 200);
+                        c = getRandomInt(50, 200);
+                        break;
+                }
+                
+                if (includeNegatives && Math.random() > 0.5) a *= -1;
+                if (includeNegatives && Math.random() > 0.5) b *= -1;
+                if (includeNegatives && Math.random() > 0.5) c *= -1;
+                
+                const question = `${a} ${op1} ${b} ${op2} ${c}`;
+                const answer = eval(question);
+                
+                // Replace symbols for display
+                const displayQuestion = question.replace(/\*/g, '×');
+                
+                return {
+                    question: displayQuestion,
+                    answer: answer
+                };
+            }
+            
+            function generateOrderOfOperations(difficulty, includeNegatives) {
+                const operations = ['+', '-', '*'];
+                const numCount = difficulty === 'easy' ? 3 : 
+                                difficulty === 'medium' ? 4 : 
+                                difficulty === 'hard' ? 5 : 6;
+                
+                let numbers = [];
+                let ops = [];
+                
+                // Generate numbers based on difficulty
+                for (let i = 0; i < numCount; i++) {
+                    let max;
+                    switch (difficulty) {
+                        case 'easy': max = 20; break;
+                        case 'medium': max = 50; break;
+                        case 'hard': max = 100; break;
+                        case 'expert': max = 200; break;
+                    }
+                    
+                    let num = getRandomInt(1, max);
+                    if (includeNegatives && Math.random() > 0.3) num *= -1;
+                    numbers.push(num);
+                    
+                    if (i < numCount - 1) {
+                        ops.push(operations[Math.floor(Math.random() * operations.length)]);
+                    }
+                }
+                
+                // Build expression with parentheses
+                let expression = numbers[0];
+                for (let i = 0; i < ops.length; i++) {
+                    expression += ` ${ops[i]} ${numbers[i+1]}`;
+                }
+                
+                // Add 1-2 sets of parentheses for medium+, more for expert
+                const parenCount = difficulty === 'easy' ? 0 : 
+                                 difficulty === 'medium' ? (Math.random() > 0.7 ? 1 : 0) :
+                                 difficulty === 'hard' ? 1 : 
+                                 getRandomInt(1, 2);
+                
+                if (parenCount > 0) {
+                    const possiblePositions = [];
+                    for (let i = 0; i < ops.length - 1; i++) {
+                        possiblePositions.push(i);
+                    }
+                    
+                    // Shuffle possible positions
+                    for (let i = possiblePositions.length - 1; i > 0; i--) {
+                        const j = Math.floor(Math.random() * (i + 1));
+                        [possiblePositions[i], possiblePositions[j]] = [possiblePositions[j], possiblePositions[i]];
+                    }
+                    
+                    // Add parentheses at random positions
+                    for (let p = 0; p < Math.min(parenCount, possiblePositions.length); p++) {
+                        const pos = possiblePositions[p];
+                        expression = expression.split(' ');
+                        expression.splice(pos*2, 0, '(');
+                        expression.splice(pos*2 + 4, 0, ')');
+                        expression = expression.join(' ');
+                    }
+                }
+                
+                const answer = eval(expression);
+                
+                // Replace symbols for display
+                const displayExpression = expression.replace(/\*/g, '×');
+                
+                return {
+                    question: displayExpression,
+                    answer: answer
+                };
+            }
+            
+            function checkAnswers() {
+                let correct = 0;
+                let incorrect = 0;
+                
+                for (let i = 0; i < totalQuestions; i++) {
+                    const answerInput = document.getElementById(`answer-${i}`);
+                    const resultDiv = document.getElementById(`result-${i}`);
+                    
+                    // Check if this is a division problem
+                    if (answerInput && answerInput.type === 'hidden') {
+                        const quotientInput = document.getElementById(`answer-${i}-q`);
+                        const remainderInput = document.getElementById(`answer-${i}-r`);
+                        
+                        const userQuotient = parseInt(quotientInput.value);
+                        const userRemainder = parseInt(remainderInput.value);
+                        const [correctQuotient, correctRemainder] = answerInput.dataset.correct.split(',').map(Number);
+                        
+                        if (isNaN(userQuotient)) {
+                            resultDiv.textContent = 'Please enter a quotient';
+                            resultDiv.className = 'result incorrect';
+                            incorrect++;
+                        } else if (isNaN(userRemainder)) {
+                            resultDiv.textContent = 'Please enter a remainder';
+                            resultDiv.className = 'result incorrect';
+                            incorrect++;
+                        } else if (userQuotient === correctQuotient && userRemainder === correctRemainder) {
+                            resultDiv.textContent = 'Correct!';
+                            resultDiv.className = 'result correct';
+                            correct++;
+                        } else {
+                            resultDiv.textContent = `Incorrect. Correct answer: ${correctQuotient} R${correctRemainder}`;
+                            resultDiv.className = 'result incorrect';
+                            incorrect++;
+                        }
+                    } else {
+                        const userAnswer = parseFloat(answerInput.value);
+                        const correctAnswer = parseFloat(answerInput.dataset.correct);
+                        
+                        if (isNaN(userAnswer)) {
+                            resultDiv.textContent = 'Please enter an answer';
+                            resultDiv.className = 'result incorrect';
+                            incorrect++;
+                        } else if (Math.abs(userAnswer - correctAnswer) < 0.0001) { // Account for floating point precision
+                            resultDiv.textContent = 'Correct!';
+                            resultDiv.className = 'result correct';
+                            correct++;
+                        } else {
+                            resultDiv.textContent = `Incorrect. The correct answer is ${correctAnswer}`;
+                            resultDiv.className = 'result incorrect';
+                            incorrect++;
+                        }
+                    }
+                }
+                
+                correctAnswers = correct;
+                incorrectAnswers = incorrect;
+                updateStats();
+            }
+            
+            function updateStats() {
+                correctCountSpan.textContent = correctAnswers;
+                incorrectCountSpan.textContent = incorrectAnswers;
+                totalCountSpan.textContent = totalQuestions;
+            }
+            
+            function getRandomInt(min, max) {
+                return Math.floor(Math.random() * (max - min + 1)) + min;
+            }
+            
+            // Generate questions on page load
+            generateQuestions();
+        });
+    </script>
+</body>
+</html>
