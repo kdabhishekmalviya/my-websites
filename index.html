@@ -1,124 +1,146 @@
-<script type="text/javascript">
-        var gk_isXlsx = false;
-        var gk_xlsxFileLookup = {};
-        var gk_fileData = {};
-        function filledCell(cell) {
-          return cell !== '' && cell != null;
-        }
-        function loadFileData(filename) {
-        if (gk_isXlsx && gk_xlsxFileLookup[filename]) {
-            try {
-                var workbook = XLSX.read(gk_fileData[filename], { type: 'base64' });
-                var firstSheetName = workbook.SheetNames[0];
-                var worksheet = workbook.Sheets[firstSheetName];
-
-                // Convert sheet to JSON to filter blank rows
-                var jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, blankrows: false, defval: '' });
-                // Filter out blank rows (rows where all cells are empty, null, or undefined)
-                var filteredData = jsonData.filter(row => row.some(filledCell));
-
-                // Heuristic to find the header row by ignoring rows with fewer filled cells than the next row
-                var headerRowIndex = filteredData.findIndex((row, index) =>
-                  row.filter(filledCell).length >= filteredData[index + 1]?.filter(filledCell).length
-                );
-                // Fallback
-                if (headerRowIndex === -1 || headerRowIndex > 25) {
-                  headerRowIndex = 0;
-                }
-
-                // Convert filtered JSON back to CSV
-                var csv = XLSX.utils.aoa_to_sheet(filteredData.slice(headerRowIndex)); // Create a new sheet from filtered array of arrays
-                csv = XLSX.utils.sheet_to_csv(csv, { header: 1 });
-                return csv;
-            } catch (e) {
-                console.error(e);
-                return "";
-            }
-        }
-        return gk_fileData[filename] || "";
-        }
-        </script><!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Grade One Student Utilities</title>
+    <title>Grade 1 Utilities</title>
     <style>
         body {
             font-family: Arial, sans-serif;
             margin: 0;
             padding: 0;
-            background-color: #f4f4f4;
+            background-color: #f0f2f5;
         }
+
         header {
-            background-color: #4CAF50;
+            background-color: #2c3e50;
             color: white;
-            text-align: center;
             padding: 20px;
-            font-size: 2em;
-            font-weight: bold;
+            text-align: center;
+            font-size: 24px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
+
         nav {
-            background-color: #333;
-            overflow: hidden;
+            background-color: #34495e;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            gap: 15px;
         }
+
         nav button {
-            background-color: #333;
+            background-color: #3498db;
             color: white;
             border: none;
-            padding: 15px 20px;
+            padding: 10px 20px;
+            border-radius: 5px;
             cursor: pointer;
-            font-size: 1em;
-            float: left;
+            transition: background-color 0.3s;
         }
+
         nav button:hover {
-            background-color: #575757;
+            background-color: #2980b9;
         }
+
         #content {
             padding: 20px;
-            min-height: 400px;
-            background-color: white;
-            margin: 20px;
-            border-radius: 5px;
-            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            max-width: 1200px;
+            margin: 20px auto;
         }
-        @media (max-width: 600px) {
-            nav button {
-                float: none;
-                width: 100%;
-                text-align: left;
-            }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+        }
+
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            width: 70%;
+            border-radius: 5px;
+            position: relative;
+        }
+
+        .close {
+            position: absolute;
+            right: 15px;
+            top: 5px;
+            font-size: 28px;
+            cursor: pointer;
+        }
+
+        .question-card {
+            background: white;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
     </style>
 </head>
 <body>
-    <header>Grade One Student Utilities</header>
+    <header>Grade 1 Utilities</header>
+    
     <nav>
-        <button onclick="loadPage('math.html')">Page 1</button>
-        <button onclick="loadPage('page2.html')">Page 2</button>
-        <button onclick="loadPage('page3.html')">Page 3</button>
-        <!-- Add more buttons as needed for your pages -->
+        <button onclick="loadPage('math.html')">Math Questions</button>
+        <button onclick="loadPage('page2.html')">Science Questions</button>
+        <button onclick="loadPage('page3.html')">English Questions</button>
     </nav>
+
     <div id="content">
-        <p>Welcome to Grade One Student Utilities! Click a menu item to load content.</p>
+        <!-- Dynamic content will be loaded here -->
+    </div>
+
+    <!-- Modal Structure -->
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <div id="modal-body"></div>
+        </div>
     </div>
 
     <script>
-        function loadPage(page) {
-            fetch(page)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Page not found');
-                    }
-                    return response.text();
-                })
-                .then(data => {
-                    document.getElementById('content').innerHTML = data;
-                })
-                .catch(error => {
-                    document.getElementById('content').innerHTML = '<p>Error loading page. Please check if the file exists.</p>';
-                    console.error('Error:', error);
-                });
+        // Load initial content
+        window.onload = () => loadPage('page1.html');
+
+        async function loadPage(page) {
+            try {
+                const response = await fetch(page);
+                const html = await response.text();
+                document.getElementById('content').innerHTML = html;
+                
+                // Re-initialize scripts in loaded content
+                const scripts = document.getElementById('content').getElementsByTagName('script');
+                for (let script of scripts) {
+                    eval(script.innerHTML);
+                }
+            } catch (error) {
+                console.error('Error loading page:', error);
+            }
+        }
+
+        // Modal functions
+        function openModal(content) {
+            document.getElementById('modal-body').innerHTML = content;
+            document.getElementById('modal').style.display = 'block';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            if (event.target.className === 'modal') {
+                closeModal();
+            }
         }
     </script>
 </body>
