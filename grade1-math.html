@@ -1,0 +1,787 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade 1 Math Learning Hub</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        .category {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .category h2 {
+            color: #4CAF50;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .topic {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        .topic:last-child {
+            border-bottom: none;
+        }
+        .button-group {
+            display: flex;
+            gap: 10px;
+        }
+        button {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s ease;
+        }
+        .explain-btn {
+            background-color: #2196F3;
+            color: white;
+        }
+        .explain-btn:hover {
+            background-color: #1976D2;
+        }
+        .questions-btn {
+            background-color: #FF9800;
+            color: white;
+        }
+        .questions-btn:hover {
+            background-color: #F57C00;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.7);
+            overflow-y: auto;
+        }
+        .modal-content {
+            background: linear-gradient(135deg, #f6f8fc 0%, #eef1f7 100%);
+            margin: 3% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 85%;
+            max-width: 900px;
+            border-radius: 15px;
+            position: relative;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+        }
+        .close {
+            color: #555;
+            float: right;
+            font-size: 32px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+        .close:hover {
+            color: #f44336;
+        }
+        #modal-title {
+            color: #2c3e50;
+            font-size: 24px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #3498db;
+        }
+        #loader {
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #3498db;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 20px auto;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .error {
+            color: red;
+            text-align: center;
+            padding: 10px;
+            background-color: #ffe6e6;
+            border-radius: 5px;
+            margin: 10px 0;
+        }
+        .content-result {
+    line-height: 1.8;
+    padding: 25px 30px;
+    background: linear-gradient(145deg, #ffffff 0%, #f8fafc 100%);
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1), 0 1px 5px rgba(0, 0, 0, 0.05);
+    color: #2c3e50;
+    font-size: 17px;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    border-left: 5px solid #3498db;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}.content-result::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 3px;
+    background: linear-gradient(90deg, #3498db, #2ecc71, #e74c3c, #f39c12);
+    background-size: 300% 300%;
+    animation: gradientAnimation 5s ease infinite;
+}.content-result:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+}.questions-container {
+            background-color: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .questions-list {
+            counter-reset: question;
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        .questions-list li {
+            counter-increment: question;
+            margin-bottom: 20px;
+            position: relative;
+            padding: 15px;
+            background-color: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+        .questions-list li::before {
+            content: counter(question) ".";
+            position: absolute;
+            left: -30px;
+            font-weight: bold;
+            font-size: 18px;
+            color: #3498db;
+            background-color: white;
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .question-text {
+            margin-bottom: 10px;
+            font-size: 16px;
+            color: #2c3e50;
+        }
+        .answer-input {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+        .answer-input input {
+            padding: 8px 12px;
+            border: 2px solid #ddd;
+            border-radius: 5px;
+            width: 150px;
+            font-size: 14px;
+            transition: border-color 0.3s ease;
+        }
+        .answer-input input:focus {
+            border-color: #3498db;
+            outline: none;
+        }
+        .check-btn {
+            background-color: #2ecc71;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.3s ease;
+        }
+        .check-btn:hover {
+            background-color: #27ae60;
+        }
+        .feedback {
+            margin-top: 8px;
+            font-weight: bold;
+            padding: 5px 10px;
+            border-radius: 5px;
+        }
+        .correct {
+            color: #2ecc71;
+            background-color: #e8f8f5;
+        }
+        .incorrect {
+            color: #eee;
+            background-color: #fdedec;
+        }
+        .timer {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background-color: white;
+            padding: 15px 25px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            font-size: 20px;
+            font-weight: bold;
+            color: #3498db;
+            display: none;
+            z-index: 1000;
+        }
+        .timer.warning {
+            color: #e74c3c;
+            animation: pulse 1s infinite;
+        }
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        .submit-all-btn {
+            display: block;
+            margin: 20px auto;
+            background-color: #9b59b6;
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+            transition: background-color 0.3s ease;
+        }
+        .submit-all-btn:hover {
+            background-color: #8e44ad;
+        }
+        .results-summary {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            border: 2px solid #3498db;
+        }
+        .results-summary h3 {
+            color: #2c3e50;
+            margin-top: 0;
+        }
+        .score {
+            font-size: 24px;
+            font-weight: bold;
+            color: #3498db;
+            margin: 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Grade 1 Math Learning Hub</h1>
+            <p>Click on any topic to get explanations or practice questions</p>
+        </header>
+
+        <div class="category">
+            <h2>Numbers and Counting</h2>
+            <div class="topic">
+                <span>Counting from 0 to 100</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Counting from 0 to 100')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Counting from 0 to 100')">10 Questions</button>
+                </div>
+            </div>
+            <div class="topic">
+                <span>Skip counting by 2s, 5s, and 10s</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Skip counting by 2s, 5s, and 10s')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Skip counting by 2s, 5s, and 10s')">10 Questions</button>
+                </div>
+            </div>
+            <div class="topic">
+                <span>Understanding place value (ones and tens)</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Understanding place value (ones and tens)')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Understanding place value (ones and tens)')">10 Questions</button>
+                </div>
+            </div>
+            <div class="topic">
+                <span>Reading and writing numbers up to 100</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Reading and writing numbers up to 100')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Reading and writing numbers up to 100')">10 Questions</button>
+                </div>
+            </div>
+            <div class="topic">
+                <span>Comparing numbers (greater than, less than, equal to)</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Comparing numbers (greater than, less than, equal to)')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Comparing numbers (greater than, less than, equal to)')">10 Questions</button>
+                </div>
+            </div>
+            <div class="topic">
+                <span>Ordinal numbers (1st, 2nd, 3rd, etc.)</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Ordinal numbers (1st, 2nd, 3rd, etc.)')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Ordinal numbers (1st, 2nd, 3rd, etc.)')">10 Questions</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>Addition and Subtraction</h2>
+            <div class="topic">
+                <span>Adding numbers up to 20</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Adding numbers up to 20')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Adding numbers up to 20')">10 Questions</button>
+                </div>
+            </div>
+            <div class="topic">
+                <span>Subtracting numbers up to 20</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Subtracting numbers up to 20')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Subtracting numbers up to 20')">10 Questions</button>
+                </div>
+            </div>
+            <div class="topic">
+                <span>Addition and subtraction fact families</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Addition and subtraction fact families')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Addition and subtraction fact families')">10 Questions</button>
+                </div>
+            </div>
+            <div class="topic">
+                <span>Understanding addition and subtraction symbols (+, -, =)</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Understanding addition and subtraction symbols (+, -, =)')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Understanding addition and subtraction symbols (+, -, =)')">10 Questions</button>
+                </div>
+            </div>
+            <div class="topic">
+                <span>Word problems with addition and subtraction</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Word problems with addition and subtraction')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Word problems with addition and subtraction')">10 Questions</button>
+                </div>
+            </div>
+            <div class="topic">
+                <span>Mental math strategies</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Mental math strategies')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Mental math strategies')">10 Questions</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>Measurement</h2>
+            <div class="topic">
+                <span>Measuring length with non-standard units</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Measuring length with non-standard units')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Measuring length with non-standard units')">10 Questions</button>
+                </div>
+            </div>
+            <div class="topic">
+                <span>Comparing lengths and heights</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Comparing lengths and heights')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Comparing lengths and heights')">10 Questions</button>
+                </div>
+            </div>
+            <div class="topic">
+                <span>Introduction to time (hour and half-hour)</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Introduction to time (hour and half-hour)')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Introduction to time (hour and half-hour)')">10 Questions</button>
+                </div>
+            </div>
+            <div class="topic">
+                <span>Basic understanding of calendars</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Basic understanding of calendars')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Basic understanding of calendars')">10 Questions</button>
+                </div>
+            </div>
+            <div class="topic">
+                <span>Basic money concepts (coins and their values)</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Basic money concepts (coins and their values)')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Basic money concepts (coins and their values)')">10 Questions</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>Geometry</h2>
+            <div class="topic">
+                <span>Identifying 2D shapes (circle, square, triangle, rectangle)</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Identifying 2D shapes (circle, square, triangle, rectangle)')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Identifying 2D shapes (circle, square, triangle, rectangle)')">10 Questions</button>
+                </div>
+            </div>
+            <div class="topic">
+                <span>Identifying 3D shapes (sphere, cube, cylinder, cone)</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Identifying 3D shapes (sphere, cube, cylinder, cone)')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Identifying 3D shapes (sphere, cube, cylinder, cone)')">10 Questions</button>
+                </div>
+            </div>
+            <div class="topic">
+                <span>Basic properties of shapes (sides, corners)</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Basic properties of shapes (sides, corners)')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Basic properties of shapes (sides, corners)')">10 Questions</button>
+                </div>
+            </div>
+            <div class="topic">
+                <span>Position words (above, below, beside, etc.)</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Position words (above, below, beside, etc.)')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Position words (above, below, beside, etc.)')">10 Questions</button>
+                </div>
+            </div>
+            <div class="topic">
+                <span>Simple patterns and symmetry</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Simple patterns and symmetry')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Simple patterns and symmetry')">10 Questions</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>Data and Graphing</h2>
+            <div class="topic">
+                <span>Collecting simple data</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Collecting simple data')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Collecting simple data')">10 Questions</button>
+                </div>
+            </div>
+            <div class="topic">
+                <span>Reading simple graphs and charts</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Reading simple graphs and charts')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Reading simple graphs and charts')">10 Questions</button>
+                </div>
+            </div>
+            <div class="topic">
+                <span>Making tally marks</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Making tally marks')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Making tally marks')">10 Questions</button>
+                </div>
+            </div>
+            <div class="topic">
+                <span>Creating basic bar graphs</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Creating basic bar graphs')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Creating basic bar graphs')">10 Questions</button>
+                </div>
+            </div>
+            <div class="topic">
+                <span>Interpreting pictographs</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Interpreting pictographs')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Interpreting pictographs')">10 Questions</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="category">
+            <h2>Fractions (Introduction)</h2>
+            <div class="topic">
+                <span>Understanding halves and quarters</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Understanding halves and quarters')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Understanding halves and quarters')">10 Questions</button>
+                </div>
+            </div>
+            <div class="topic">
+                <span>Recognizing and creating equal parts</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Recognizing and creating equal parts')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Recognizing and creating equal parts')">10 Questions</button>
+                </div>
+            </div>
+            <div class="topic">
+                <span>Sharing equally</span>
+                <div class="button-group">
+                    <button class="explain-btn" onclick="getExplanation('Sharing equally')">Explain</button>
+                    <button class="questions-btn" onclick="getQuestions('Sharing equally')">10 Questions</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modal-title"></h2>
+            <div id="modal-content">
+                <div id="loader"></div>
+            </div>
+        </div>
+    </div>
+
+    <div id="timer" class="timer">
+        Time: <span id="timer-display">15:00</span>
+    </div>
+
+    <script>
+        // Replace with your actual Gemini API key
+        const GEMINI_API_KEY = 'AIzaSyCkKUXZkWLo1YVOWKzdpaPnTR1OBrOTJEI';
+        const GEMINI_API_URL = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyCkKUXZkWLo1YVOWKzdpaPnTR1OBrOTJEI';
+
+        let timerInterval;
+        let timeLeft = 900; // 15 minutes in seconds
+        let currentQuestions = [];
+        let correctAnswers = [];
+
+        async function fetchFromGemini(prompt) {
+            try {
+                const response = await fetch(GEMINI_API_URL, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        contents: [{
+                            parts: [{
+                                text: prompt
+                            }]
+                        }]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+
+                const data = await response.json();
+                return data.candidates[0].content.parts[0].text;
+            } catch (error) {
+                console.error('Error:', error);
+                return 'Error fetching content. Please try again later.';
+            }
+        }
+
+        async function getExplanation(topic) {
+            showModal(topic + ' - Explanation');
+            const prompt = `Provide a clear and simple explanation of "${topic}" suitable for Grade 1 students. Include examples and make it engaging for children.`;
+            const content = await fetchFromGemini(prompt);
+            displayContent(content);
+        }
+
+        async function getQuestions(topic) {
+            showModal(topic + ' - 10 Questions');
+            startTimer();
+            const prompt = `Generate 10 simple practice questions about "${topic}" suitable for Grade 1 students. Each question should have a specific answer. Format: Question followed by | and then the answer. Example: "What comes after 5? | 6". Make the questions engaging and age-appropriate.`;
+            const content = await fetchFromGemini(prompt);
+            displayQuestions(content);
+            
+            // Get correct answers for the questions
+            const answersPrompt = `Based on these questions, provide only the correct answers in order, separated by semicolons: ${content}`;
+            const answersContent = await fetchFromGemini(answersPrompt);
+            correctAnswers = answersContent.split(';').map(answer => answer.trim());
+        }
+
+        function startTimer() {
+            timeLeft = 900; // Reset to 15 minutes
+            document.getElementById('timer').style.display = 'block';
+            clearInterval(timerInterval);
+            
+            timerInterval = setInterval(() => {
+                timeLeft--;
+                updateTimerDisplay();
+                
+                if (timeLeft <= 300) { // 5 minutes warning
+                    document.getElementById('timer').classList.add('warning');
+                }
+                
+                if (timeLeft <= 0) {
+                    clearInterval(timerInterval);
+                    submitAllAnswers();
+                    alert('Time\'s up! Let\'s see how you did!');
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeLeft / 60);
+            const seconds = timeLeft % 60;
+            document.getElementById('timer-display').textContent = 
+                `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+        }
+
+        function stopTimer() {
+            clearInterval(timerInterval);
+            document.getElementById('timer').style.display = 'none';
+            document.getElementById('timer').classList.remove('warning');
+        }
+
+        function showModal(title) {
+            document.getElementById('modal').style.display = 'block';
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-content').innerHTML = '<div id="loader"></div>';
+        }
+
+        function closeModal() {
+            document.getElementById('modal').style.display = 'none';
+            stopTimer();
+        }
+
+        function displayContent(content) {
+            if (content.includes('Error')) {
+                document.getElementById('modal-content').innerHTML = `<div class="error">${content}</div>`;
+            } else {
+                document.getElementById('modal-content').innerHTML = `<div class="content-result">${content.replace(/\n/g, '<br>')}</div>`;
+            }
+        }
+
+        function displayQuestions(content) {
+            if (content.includes('Error')) {
+                document.getElementById('modal-content').innerHTML = `<div class="error">${content}</div>`;
+                return;
+            }
+
+            const questions = content.split('\n').filter(line => line.trim() !== '');
+            const questionsContainer = document.createElement('div');
+            questionsContainer.className = 'questions-container';
+            
+            const questionsList = document.createElement('ul');
+            questionsList.className = 'questions-list';
+            
+            questions.forEach((question, index) => {
+                const [questionText, answer] = question.split('|').map(part => part.trim());
+                const li = document.createElement('li');
+                
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'question-text';
+                questionDiv.textContent = questionText;
+                
+                const answerDiv = document.createElement('div');
+                answerDiv.className = 'answer-input';
+                
+                const input = document.createElement('input');
+                input.type = 'text';
+                input.placeholder = 'Your answer';
+                input.id = `answer-${index}`;
+                
+                const checkBtn = document.createElement('button');
+                checkBtn.className = 'check-btn';
+                checkBtn.textContent = 'Check';
+                checkBtn.onclick = () => checkAnswer(index, answer || correctAnswers[index]);
+                
+                const feedback = document.createElement('div');
+                feedback.className = 'feedback';
+                feedback.id = `feedback-${index}`;
+                
+                answerDiv.appendChild(input);
+                answerDiv.appendChild(checkBtn);
+                
+                li.appendChild(questionDiv);
+                li.appendChild(answerDiv);
+                li.appendChild(feedback);
+                
+                questionsList.appendChild(li);
+            });
+            
+            questionsContainer.appendChild(questionsList);
+            
+            const submitAllBtn = document.createElement('button');
+            submitAllBtn.className = 'submit-all-btn';
+            submitAllBtn.textContent = 'Submit All Answers';
+            submitAllBtn.onclick = submitAllAnswers;
+            
+            questionsContainer.appendChild(submitAllBtn);
+            
+            document.getElementById('modal-content').innerHTML = '';
+            document.getElementById('modal-content').appendChild(questionsContainer);
+        }
+
+        function checkAnswer(index, correctAnswer) {
+            const input = document.getElementById(`answer-${index}`);
+            const feedback = document.getElementById(`feedback-${index}`);
+            const userAnswer = input.value.trim();
+            
+            if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+                feedback.textContent = 'Correct! Great job!';
+                feedback.className = 'feedback correct';
+                input.style.borderColor = '#2ecc71';
+            } else {
+                feedback.textContent = `Incorrect. The answer is: ${correctAnswer}`;
+                feedback.className = 'feedback incorrect';
+                input.style.borderColor = '#e74c3c';
+            }
+        }
+
+        function submitAllAnswers() {
+            stopTimer();
+            let score = 0;
+            const totalQuestions = correctAnswers.length;
+            
+            for (let i = 0; i < totalQuestions; i++) {
+                const input = document.getElementById(`answer-${i}`);
+                if (input && input.value.trim().toLowerCase() === correctAnswers[i].toLowerCase()) {
+                    score++;
+                }
+                checkAnswer(i, correctAnswers[i]);
+            }
+            
+            const resultsSummary = document.createElement('div');
+            resultsSummary.className = 'results-summary';
+            resultsSummary.innerHTML = `
+                <h3>Results Summary/h3>
+                <div class="score">Score: ${score}/${totalQuestions}</div>
+                <p>You got ${score} questions correct out of ${totalQuestions}!</p>
+                <p>${score === totalQuestions ? 'Perfect score! Amazing work!' : 
+                     score >= totalQuestions * 0.8 ? 'Great job! Keep practicing!' : 
+                     score >= totalQuestions * 0.6 ? 'Good effort! Practice more to improve.' : 
+                     'Keep practicing and you\'ll get better!'}</p>
+            `;
+
+            document.getElementById('modal-content').appendChild(resultsSummary);
+    }
+
+    // Close modal when clicking outside
+    window.onclick = function(event) {
+        if (event.target == document.getElementById('modal')) {
+            closeModal();
+        }
+    }
+</script>
+</body>
+</html>
+</antArtifact>
