@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade One Student Utilities</title>
+    <style>
+        body {
+            font-family: 'Comic Sans MS', cursive, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f8ff;
+        }
+        
+        .header {
+            background-color: #ff9966;
+            color: white;
+            text-align: center;
+            padding: 20px;
+            font-size: 24px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        
+        .menu-bar {
+            background-color: #66ccff;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+        }
+        
+        .menu-bar a {
+            color: white;
+            text-align: center;
+            padding: 14px 20px;
+            text-decoration: none;
+            font-size: 18px;
+            transition: background-color 0.3s;
+        }
+        
+        .menu-bar a:hover {
+            background-color: #3399ff;
+        }
+        
+        .content-area {
+            padding: 20px;
+            min-height: 300px;
+            border: 1px solid #ddd;
+            margin: 20px;
+            background-color: white;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        
+        .welcome-message {
+            text-align: center;
+            color: #666;
+            font-size: 20px;
+            margin-top: 50px;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        Grade One Student Utilities
+    </div>
+    
+    <div class="menu-bar">
+        <a href="#" onclick="loadPage('tmp.html')">Math</a>
+        <a href="#" onclick="loadPage('reading.html')">Reading</a>
+        <a href="#" onclick="loadPage('writing.html')">Writing</a>
+        <a href="#" onclick="loadPage('games.html')">Games</a>
+    </div>
+    
+    <div class="content-area" id="content">
+        <div class="welcome-message">
+            Welcome to Grade One Utilities!<br>
+            Click on a menu above to get started.
+        </div>
+    </div>
+    
+    <script>
+        function loadPage(page) {
+    fetch(page)
+        .then(response => response.text())
+        .then(html => {
+            document.getElementById('content').innerHTML = html;
+        })
+        .catch(err => {
+            console.warn('Error loading page:', err);
+        });
+};
+
+        function loadPage1(page) {
+            // In a real implementation, this would fetch the HTML file
+            // For this example, we'll just show placeholder content
+            
+            let content = "";
+            
+            switch(page) {
+                case 'tmp.html':
+                    content = `<h2>Math Activities</h2>
+                              <p>Counting exercises, addition practice, and number games will appear here.</p>
+                              <img src="https://via.placeholder.com/300x200?text=Math+Activities" alt="Math">`;
+                    break;
+                case 'reading.html':
+                    content = `<h2>Reading Practice</h2>
+                              <p>Simple stories, phonics exercises, and vocabulary builders will appear here.</p>
+                              <img src="https://via.placeholder.com/300x200?text=Reading+Activities" alt="Reading">`;
+                    break;
+                case 'writing.html':
+                    content = `<h2>Writing Practice</h2>
+                              <p>Letter tracing, word formation, and simple sentence builders will appear here.</p>
+                              <img src="https://via.placeholder.com/300x200?text=Writing+Activities" alt="Writing">`;
+                    break;
+                case 'games.html':
+                    content = `<h2>Learning Games</h2>
+                              <p>Educational games that make learning fun will appear here.</p>
+                              <img src="https://via.placeholder.com/300x200?text=Educational+Games" alt="Games">`;
+                    break;
+                default:
+                    content = `<div class="welcome-message">
+                                Welcome to Grade One Utilities!<br>
+                                Click on a menu above to get started.
+                              </div>`;
+            }
+            
+            document.getElementById('content').innerHTML = content;
+        }
+    </script>
+</body>
+</html>
