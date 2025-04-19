@@ -131,25 +131,96 @@
     <script>
         document.getElementById('generate-button').addEventListener('click', generateStory);
 
-        async function generateStory() {
+async function generateStory() {
+    const loadingDiv = document.getElementById('loading');
+    loadingDiv.style.display = 'block';
+    // Replace with your actual API key
+    const API_KEY = 'YOUR_GOOGLE_API_KEY';
+    const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=AIzaSyCkKUXZkWLo1YVOWKzdpaPnTR1OBrOTJEI`;
+    
+    const prompt = {
+        contents: [{
+            parts: [{
+                text: "Generate a list of exactly 50 creative and engaging story topics for children year 10. " +
+                      "Return only a JavaScript array format with comma-separated values, like this: " +
+                      "[\"Topic 1\", \"Topic 2\", \"Topic 3\"]. " +
+                      "Make sure there are exactly 50 items in the array and the topics are diverse, " +
+                      "including mermaid, fairy tales, adventures, animal stories, and educational themes."
+            }]
+        }]
+    };
+
+    try {
+        const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(prompt)
+        });
+
+        if (!response.ok) {
+            throw new Error(`API request failed with status ${response.status}`);
+        }
+
+        const data = await response.json();
+        
+        // Extract the response text
+        const responseText = data.candidates[0].content.parts[0].text;
+        
+        // Try to parse the array from the response
+        try {
+            // This regex extracts the array portion from the response
+            const arrayMatch = responseText.match(/\[.*\]/s);
+            if (arrayMatch) {
+                const topicsArray = JSON.parse(arrayMatch[0]);
+                    generateStory1(topicsArray,loadingDiv);
+            } else {
+                throw new Error("Couldn't find array in response");
+            }
+        } catch (parseError) {
+            console.error("Error parsing response:", parseError);
+            throw new Error("Failed to parse topics from API response");
+        }
+    } catch (error) {
+        console.error("Error fetching topics:", error);
+        
+        // Fallback list in case API fails
+        return [
+            "Fairy Tale Adventures", "Princess and the Castle", "Dragon's Birthday Party",
+            "The Lost Unicorn", "Pirate Puppy's Treasure", "Space Cat Explorers",
+            "The Talking Tree", "Underwater Robot Friends", "Wizard School Mishaps",
+            "The Kindness Kingdom", "Dinosaur Playdate", "Rainbow Magic Show",
+            "Superhero Squirrels", "The Chocolate River", "Giant's Tiny Problem",
+            "Mermaid's First Day of School", "Robot Who Wanted to Dance", "Cloud Castle",
+            "The Shy Monster", "Jungle Tea Party", "Time-Traveling Teddy Bear",
+            "The Moon Rabbit", "Invisible Friend", "Cookie Factory Mystery",
+            "Snowman's Summer Vacation", "Alien in the Backyard", "Magical Library",
+            "Talking Animal Band", "The Wishing Well", "Dragon Who Couldn't Breathe Fire",
+            "Little Witch's Big Dream", "Pirate Who Was Afraid of Water", "Robot Pet Show",
+            "The Lonely Star", "Garden of Giant Vegetables", "Sleepover at the Museum",
+            "The Forgetful Wizard", "Tiny Giant", "Circus in the Sky",
+            "The Brave Little Turtle", "Magic Paintbrush", "Dinosaur in the City",
+            "The Cloud Shepherd", "Moonlight Unicorn", "Secret Door in the Classroom",
+            "The Candy Planet", "Talking Toys Adventure", "Ghost Who Wanted Friends",
+            "The Rainbow Bridge", "Little Explorer's Big Discovery", "Animal Olympics"
+        ].slice(0, 50); // Ensure exactly 50 items
+    }
+}
+
+// Example usage:
+// getTopics().then(topics => console.log(topics));
+
+        async function generateStory1(storyTopics,loadingDiv) {
             const storyContentDiv = document.getElementById('story-content');
             const storyImage = document.getElementById('story-image');
-            const loadingDiv = document.getElementById('loading');
+            
 
             storyContentDiv.innerHTML = '';
             storyImage.style.display = 'none';
-            loadingDiv.style.display = 'block';
+            
 
             try {
-                const storyTopics = [
-  "Fairy Tale Adventures", "Princess and the Castle", "Talking Animals", "Magical Forest",
-  "Underwater Kingdom", "Friendly Dragons", "Unicorn Quest", "Super Kids", "Space Explorers",
-  "Lost Treasure Hunt", "Enchanted Garden", "Magic School", "The Flying Carpet Ride", "Pirate Adventure",
-  "Time-Traveling Kids", "Robot Friends", "The Ice Cream Planet", "The Rainbow Bridge", "Jungle Friends",
-  "The Cloud Kingdom", "Toyland Tales", "Secret Door in the Tree", "Wishing Star", "Midnight Zoo",
-  "Balloon City", "Dream Catchers", "The Snowflake Village", "Mermaid Lagoon", "The Musical Mountains",
-  "The Crayon Kingdom"
-];
 
                 const randomTopic = storyTopics[Math.floor(Math.random() * storyTopics.length)];
 
@@ -162,7 +233,7 @@
                         "contents": [{
                             "parts": [
                                 {
-                                    "text": "Generate a story about "+randomTopic+" for a 7-year-old kid with simple language ,  having highligting the title on top with trailing 5 stars  and story from next line "
+                                    "text": "Generate a random story about "+randomTopic+" for a kid with simple language ,  having highligting the title on top with trailing 5 stars  and story from next line "
                                 }
                             ]
                         }]
