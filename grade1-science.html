@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grade 1 Science Explorer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f0f8ff;
+            color: #333;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+        }
+        
+        .topic-selector {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        select {
+            padding: 10px;
+            font-size: 16px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+        }
+        
+        .mode-buttons {
+            margin: 20px 0;
+            text-align: center;
+        }
+        
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin: 0 10px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        
+        .btn-explain {
+            background-color: #3498db;
+            color: white;
+        }
+        
+        .btn-quiz {
+            background-color: #2ecc71;
+            color: white;
+        }
+        
+        button:hover {
+            opacity: 0.9;
+        }
+        
+        .content-area {
+            margin-top: 30px;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            min-height: 200px;
+        }
+        
+        .explanation {
+            line-height: 1.6;
+        }
+        
+        .quiz-area {
+            display: none;
+        }
+        
+        .question {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+        }
+        
+        .answer-section {
+            margin-top: 10px;
+        }
+        
+        .show-answer {
+            background-color: #e67e22;
+            color: white;
+            margin-top: 10px;
+        }
+        
+        .hidden-answer {
+            display: none;
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #eee;
+            border-radius: 5px;
+        }
+        
+        .illustration {
+            text-align: center;
+            margin: 20px 0;
+        }
+        
+        .score {
+            text-align: center;
+            font-size: 1.2em;
+            margin-top: 20px;
+            color: #2c3e50;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🌟 Grade 1 Science Explorer 🌟</h1>
+        
+        <div class="topic-selector">
+            <select id="topicSelect">
+                <option value="">Choose a topic</option>
+                <optgroup label="Life Science">
+                    <option value="plants">Plants</option>
+                    <option value="animals">Animals</option>
+                    <option value="human-body">Human Body</option>
+                </optgroup>
+                <optgroup label="Earth and Space Science">
+                    <option value="weather">Weather</option>
+                    <option value="earth-resources">Earth's Resources</option>
+                    <option value="sky-space">Sky and Space</option>
+                </optgroup>
+                <optgroup label="Physical Science">
+                    <option value="matter">Matter and Materials</option>
+                    <option value="motion">Motion and Forces</option>
+                    <option value="light-sound">Light and Sound</option>
+                </optgroup>
+            </select>
+        </div>
+        
+        <div class="mode-buttons">
+            <button class="btn-explain" onclick="showExplanation()">Learn About It</button>
+            <button class="btn-quiz" onclick="showQuiz()">Take a Quiz</button>
+        </div>
+        
+        <div class="content-area">
+            <div id="explanation" class="explanation"></div>
+            <div id="quiz" class="quiz-area"></div>
+        </div>
+    </div>
+
+    <script>
+        const content = {
+            plants: {
+                explanation: `
+                    <h2>Plants 🌱</h2>
+                    <p>Plants are living things that need three basic things to grow:</p>
+                    <ul>
+                        <li><strong>Sunlight</strong> - Plants use sunlight to make their own food</li>
+                        <li><strong>Water</strong> - Plants need water to stay alive and grow</li>
+                        <li><strong>Air</strong> - Plants use air to breathe and make food</li>
+                    </ul>
+                    
+                    <h3>Parts of a plant:</h3>
+                    <ul>
+                        <li><strong>Roots</strong> - Hold the plant in the soil and drink water</li>
+                        <li><strong>Stem</strong> - Helps the plant stand up and carries water from roots to leaves</li>
+                        <li><strong>Leaves</strong> - Make food for the plant using sunlight</li>
+                        <li><strong>Flowers</strong> - Make seeds to create new plants</li>
+                    </ul>
+                    
+                    <p>We can watch plants grow by planting a seed and giving it what it needs. A bean or pea plant is fun to grow and watch!</p>
+                `,
+                questions: [
+                    {
+                        q: "What three things do plants need to grow?",
+                        a: "Sunlight, water, and air"
+                    },
+                    {
+                        q: "Which part of the plant drinks water from the soil?",
+                        a: "The roots"
+                    },
+                    {
+                        q: "What do leaves use to make food for the plant?",
+                        a: "Sunlight"
+                    },
+                    {
+                        q: "Which part of the plant helps it stand up?",
+                        a: "The stem"
+                    },
+                    {
+                        q: "What do flowers make?",
+                        a: "Seeds"
+                    },
+                    {
+                        q: "What happens if you don't water a plant?",
+                        a: "It will wilt and might die"
+                    },
+                    {
+                        q: "Can plants grow without sunlight?",
+                        a: "No, they need sunlight to make their food"
+                    },
+                    {
+                        q: "Where do roots grow?",
+                        a: "Under the ground in the soil"
+                    },
+                    {
+                        q: "What color are most plant leaves?",
+                        a: "Green"
+                    },
+                    {
+                        q: "What comes out of a seed when it starts to grow?",
+                        a: "A tiny root first, then a stem with leaves"
+                    }
+                ]
+            },
+            animals: {
+                explanation: `
+                    <h2>Animals 🐶</h2>
+                    <p>Animals are living things that move around to find what they need. There are many types of animals:</p>
+                    <ul>
+                        <li><strong>Mammals</strong> - Animals with fur or hair (dogs, cats, bears)</li>
+                        <li><strong>Birds</strong> - Animals with feathers that lay eggs (eagles, chickens)</li>
+                        <li><strong>Fish</strong> - Animals that live in water and have gills (goldfish, sharks)</li>
+                        <li><strong>Insects</strong> - Small animals with six legs (ants, butterflies)</li>
+                    </ul>
+                    
+                    <h3>What animals need to live:</h3>
+                    <ul>
+                        <li><strong>Food</strong> - Different animals eat different foods</li>
+                        <li><strong>Water</strong> - All animals need water to drink</li>
+                        <li><strong>Shelter</strong> - A safe place to live and rest</li>
+                    </ul>
+                    
+                    <h3>Animal habitats (homes):</h3>
+                    <ul>
+                        <li><strong>Forest</strong> - Where deer, birds, and squirrels live</li>
+                        <li><strong>Ocean</strong> - Where fish, whales, and crabs live</li>
+                        <li><strong>Desert</strong> - Where camels, lizards, and snakes live</li>
+                    </ul>
+                `,
+                questions: [
+                    {
+                        q: "What type of animal has feathers?",
+                        a: "Birds"
+                    },
+                    {
+                        q: "How many legs do insects have?",
+                        a: "Six legs"
+                    },
+                    {
+                        q: "What do fish use to breathe underwater?",
+                        a: "Gills"
+                    },
+                    {
+                        q: "Name three things all animals need to live.",
+                        a: "Food, water, and shelter"
+                    },
+                    {
+                        q: "Where do whales live?",
+                        a: "In the ocean"
+                    },
+                    {
+                        q: "What animals live in the forest?",
+                        a: "Deer, birds, squirrels, bears, and many others"
+                    },
+                    {
+                        q: "Which type of animal has fur or hair?",
+                        a: "Mammals"
+                    },
+                    {
+                        q: "What kind of animal is a dog?",
+                        a: "A mammal"
+                    },
+                    {
+                        q: "Where do camels live?",
+                        a: "In the desert"
+                    },
+                    {
+                        q: "Can birds fly if their wings are wet?",
+                        a: "Most birds have trouble flying with very wet wings"
+                    }
+                ]
+            },
+            'human-body': {
+                explanation: `
+                    <h2>Human Body 👦👧</h2>
+                    <p>Our body has many parts that help us do different things:</p>
+                    <ul>
+                        <li><strong>Eyes</strong> - Help us see</li>
+                        <li><strong>Ears</strong> - Help us hear sounds</li>
+                        <li><strong>Nose</strong> - Helps us smell and breathe</li>
+                        <li><strong>Mouth</strong> - Helps us eat, talk, and taste</li>
+                        <li><strong>Hands</strong> - Help us touch and hold things</li>
+                    </ul>
+                    
+                    <h3>Our five senses:</h3>
+                    <ul>
+                        <li><strong>Sight</strong> - Our eyes let us see colors, shapes, and movement</li>
+                        <li><strong>Hearing</strong> - Our ears let us hear sounds like music and voices</li>
+                        <li><strong>Touch</strong> - Our skin lets us feel hot, cold, soft, and rough</li>
+                        <li><strong>Taste</strong> - Our tongue lets us taste sweet, sour, salty, and bitter</li>
+                        <li><strong>Smell</strong> - Our nose lets us smell flowers, food, and more</li>
+                    </ul>
+                `,
+                questions: [
+                    {
+                        q: "What do we use to see?",
+                        a: "Our eyes"
+                    },
+                    {
+                        q: "How many senses do humans have?",
+                        a: "Five senses"
+                    },
+                    {
+                        q: "What part of our body helps us smell flowers?",
+                        a: "Our nose"
+                    },
+                    {
+                        q: "What do we use our hands for?",
+                        a: "To touch and hold things"
+                    },
+                    {
+                        q: "What sense tells us if something is hot or cold?",
+                        a: "Touch"
+                    },
+                    {
+                        q: "What part of our body helps us taste food?",
+                        a: "Our tongue"
+                    },
+                    {
+                        q: "What do ears help us do?",
+                        a: "Hear sounds"
+                    },
+                    {
+                        q: "Can you name all five senses?",
+                        a: "Sight, hearing, touch, taste, and smell"
+                    },
+                    {
+                        q: "What do we use our mouth for?",
+                        a: "Eating, talking, and tasting"
+                    },
+                    {
+                        q: "Which sense helps us know if music is playing?",
+                        a: "Hearing"
+                    }
+                ]
+            },
+            weather: {
+                explanation: `
+                    <h2>Weather ☀️⛅🌧️</h2>
+                    <p>Weather is what the air is like outside. It can be:</p>
+                    <ul>
+                        <li><strong>Sunny</strong> - When the sun is shining and there are few clouds</li>
+                        <li><strong>Rainy</strong> - When water falls from clouds</li>
+                        <li><strong>Windy</strong> - When air is moving fast</li>
+                        <li><strong>Cloudy</strong> - When the sky is covered with clouds</li>
+                    </ul>
+                    
+                    <h3>The four seasons:</h3>
+                    <ul>
+                        <li><strong>Winter</strong> - Cold weather, sometimes snow, trees have no leaves</li>
+                        <li><strong>Spring</strong> - Warm weather, flowers bloom, baby animals are born</li>
+                        <li><strong>Summer</strong> - Hot weather, long days, vacations</li>
+                        <li><strong>Fall</strong> - Cool weather, leaves change color and fall</li>
+                    </ul>
+                    
+                    <p>We can measure the weather using tools like a thermometer to check how hot or cold it is.</p>
+                `,
+                questions: [
+                    {
+                        q: "What is the weather like when water falls from clouds?",
+                        a: "Rainy"
+                    },
+                    {
+                        q: "How many seasons are there?",
+                        a: "Four seasons"
+                    },
+                    {
+                        q: "Which season is the coldest?",
+                        a: "Winter"
+                    },
+                    {
+                        q: "What tool do we use to measure temperature?",
+                        a: "A thermometer"
+                    },
+                    {
+                        q: "In which season do flowers bloom?",
+                        a: "Spring"
+                    },
+                    {
+                        q: "What happens to leaves in fall?",
+                        a: "They change color and fall from trees"
+                    },
+                    {
+                        q: "Which season is the hottest?",
+                        a: "Summer"
+                    },
+                    {
+                        q: "What is the weather like when air moves fast?",
+                        a: "Windy"
+                    },
+                    {
+                        q: "What covers the sky on a cloudy day?",
+                        a: "Clouds"
+                    },
+                    {
+                        q: "What can fall from the sky in winter?",
+                        a: "Snow"
+                    }
+                ]
+            },
+            'earth-resources': {
+                explanation: `
+                    <h2>Earth's Resources 🌍</h2>
+                    <p>Earth gives us natural resources we need to live:</p>
+                    <ul>
+                        <li><strong>Water</strong> - Found in oceans, rivers, and lakes</li>
+                        <li><strong>Air</strong> - All around us, what we breathe</li>
+                        <li><strong>Soil</strong> - Where plants grow</li>
+                        <li><strong>Rocks</strong> - Used to build things</li>
+                    </ul>
+                    
+                    <h3>Caring for the environment:</h3>
+                    <ul>
+                        <li><strong>Recycling</strong> - Using things again instead of throwing them away</li>
+                        <li><strong>Reducing waste</strong> - Using less things that we throw away</li>
+                        <li><strong>Saving water</strong> - Not wasting water when we brush teeth or wash hands</li>
+                        <li><strong>Planting trees</strong> - Trees give us clean air to breathe</li>
+                    </ul>
+                `,
+                questions: [
+                    {
+                        q: "What do we breathe?",
+                        a: "Air"
+                    },
+                    {
+                        q: "Where do plants grow?",
+                        a: "In soil"
+                    },
+                    {
+                        q: "What is recycling?",
+                        a: "Using things again instead of throwing them away"
+                    },
+                    {
+                        q: "Name a place where we can find water in nature.",
+                        a: "Oceans, rivers, or lakes"
+                    },
+                    {
+                        q: "What do trees give us?",
+                        a: "Clean air to breathe"
+                    },
+                    {
+                        q: "What can we do to save water?",
+                        a: "Turn off the tap when brushing teeth or washing hands"
+                    },
+                    {
+                        q: "What are rocks used for?",
+                        a: "Building things"
+                    },
+                    {
+                        q: "Why should we reduce waste?",
+                        a: "To help take care of our Earth"
+                    },
+                    {
+                        q: "Can we drink water from the ocean?",
+                        a: "No, ocean water is salty"
+                    },
+                    {
+                        q: "What happens when we plant trees?",
+                        a: "They grow and give us clean air"
+                    }
+                ]
+            },
+            'sky-space': {
+                explanation: `
+                    <h2>Sky and Space 🌞🌙⭐</h2>
+                    <p>When we look up at the sky, we can see:</p>
+                    <ul>
+                        <li><strong>The Sun</strong> - Gives us light and heat during the day</li>
+                        <li><strong>The Moon</strong> - Shines at night (reflects the sun's light)</li>
+                        <li><strong>Stars</strong> - Tiny lights we see at night</li>
+                    </ul>
+                    
+                    <h3>Day and night:</h3>
+                    <ul>
+                        <li><strong>Day</strong> - When our part of Earth faces the sun</li>
+                        <li><strong>Night</strong> - When our part of Earth faces away from the sun</li>
+                    </ul>
+                    
+                    <p>The sun is very important because it gives us light to see and heat to keep us warm. Without the sun, plants couldn't grow and we couldn't live on Earth.</p>
+                `,
+                questions: [
+                    {
+                        q: "What gives us light during the day?",
+                        a: "The sun"
+                    },
+                    {
+                        q: "When can we see stars?",
+                        a: "At night"
+                    },
+                    {
+                        q: "What does the sun give us besides light?",
+                        a: "Heat"
+                    },
+                    {
+                        q: "Why is it night time?",
+                        a: "Because our part of Earth faces away from the sun"
+                    },
+                    {
+                        q: "Does the moon make its own light?",
+                        a: "No, it reflects the sun's light"
+                    },
+                    {
+                        q: "Can we look directly at the sun?",
+                        a: "No, it can hurt our eyes"
+                    },
+                    {
+                        q: "What would happen without the sun?",
+                        a: "Plants couldn't grow and we couldn't live on Earth"
+                    },
+                    {
+                        q: "Are stars tiny lights?",
+                        a: "They look tiny from Earth, but they're actually very big and far away"
+                    },
+                    {
+                        q: "When does the moon usually shine?",
+                        a: "At night"
+                    },
+                    {
+                        q: "Why is daytime bright?",
+                        a: "Because the sun is shining on our part of Earth"
+                    }
+                ]
+            },
+            matter: {
+                explanation: `
+                    <h2>Matter and Materials 📦</h2>
+                    <p>Everything around us is made of matter. Objects have properties we can observe:</p>
+                    <ul>
+                        <li><strong>Size</strong> - How big or small something is</li>
+                        <li><strong>Shape</strong> - Round, square, triangle, etc.</li>
+                        <li><strong>Color</strong> - Red, blue, green, etc.</li>
+                        <li><strong>Texture</strong> - How something feels (smooth, rough, soft)</li>
+                    </ul>
+                    
+                    <h3>Types of matter:</h3>
+                    <ul>
+                        <li><strong>Solids</strong> - Things that keep their shape (rocks, books, toys)</li>
+                        <li><strong>Liquids</strong> - Things that flow and take the shape of their container (water, milk)</li>
+                        <li><strong>Gases</strong> - Things we can't see but fill the space around us (air)</li>
+                    </ul>
+                    
+                    <h3>Common materials:</h3>
+                    <ul>
+                        <li><strong>Wood</strong> - From trees, used for furniture</li>
+                        <li><strong>Metal</strong> - Strong and shiny, used for cars</li>
+                        <li><strong>Plastic</strong> - Can be made into many shapes, used for toys</li>
+                    </ul>
+                `,
+                questions: [
+                    {
+                        q: "What type of matter keeps its shape?",
+                        a: "Solids"
+                    },
+                    {
+                        q: "Is water a solid, liquid, or gas?",
+                        a: "Liquid"
+                    },
+                    {
+                        q: "What type of matter takes the shape of its container?",
+                        a: "Liquids"
+                    },
+                    {
+                        q: "Is air a solid, liquid, or gas?",
+                        a: "Gas"
+                    },
+                    {
+                        q: "What are some properties we can observe about objects?",
+                        a: "Size, shape, color, and texture"
+                    },
+                    {
+                        q: "What material comes from trees?",
+                        a: "Wood"
+                    },
+                    {
+                        q: "Is a rock a solid or a liquid?",
+                        a: "Solid"
+                    },
+                    {
+                        q: "What kind of texture does sandpaper have?",
+                        a: "Rough"
+                    },
+                    {
+                        q: "What material is often used to make toys?",
+                        a: "Plastic"
+                    },
+                    {
+                        q: "What material is strong and shiny?",
+                        a: "Metal"
+                    }
+                ]
+            },
+            motion: {
+                explanation: `
+                    <h2>Motion and Forces 🔄</h2>
+                    <p>Objects move when forces act on them. The main forces are:</p>
+                    <ul>
+                        <li><strong>Push</strong> - When you move something away from you</li>
+                        <li><strong>Pull</strong> - When you move something toward you</li>
+                        <li><strong>Gravity</strong> - The force that pulls things down toward Earth</li>
+                    </ul>
+                    
+                    <h3>How things move:</h3>
+                    <ul>
+                        <li>Pushing a door open</li>
+                        <li>Pulling a wagon</li>
+                        <li>A ball rolling down a hill</li>
+                        <li>A toy car rolling across the floor</li>
+                    </ul>
+                    
+                    <h3>Simple machines that help us:</h3>
+                    <ul>
+                        <li><strong>Ramps</strong> - Make it easier to move things up or down</li>
+                        <li><strong>Levers</strong> - Help lift heavy things (like a seesaw)</li>
+                    </ul>
+                `,
+                questions: [
+                    {
+                        q: "What force makes things fall down?",
+                        a: "Gravity"
+                    },
+                    {
+                        q: "Is opening a door a push or a pull?",
+                        a: "Push"
+                    },
+                    {
+                        q: "Is using a fishing rod to catch fish a push or a pull?",
+                        a: "Pull"
+                    },
+                    {
+                        q: "What happens when you let go of a ball in the air?",
+                        a: "It falls down because of gravity"
+                    },
+                    {
+                        q: "What simple machine makes it easier to move things up?",
+                        a: "A ramp"
+                    },
+                    {
+                        q: "Is a seesaw an example of a lever?",
+                        a: "Yes"
+                    },
+                    {
+                        q: "Do objects need a force to start moving?",
+                        a: "Yes"
+                    },
+                    {
+                        q: "Why does a ball roll down a hill?",
+                        a: "Because of gravity"
+                    },
+                    {
+                        q: "Can you make a toy car move without touching it?",
+                        a: "Yes, by tilting the surface or using gravity"
+                    },
+                    {
+                        q: "What force helps you climb a rope?",
+                        a: "Pulling force"
+                    }
+                ]
+            },
+            'light-sound': {
+                explanation: `
+                    <h2>Light and Sound 💡🔊</h2>
+                    <p>Light and sound are important in our daily lives:</p>
+                    
+                    <h3>Light:</h3>
+                    <ul>
+                        <li><strong>Sources of light</strong> - Sun, lamps, flashlights</li>
+                        <li><strong>Shadows</strong> - Dark shapes made when light is blocked</li>
+                        <li><strong>Reflections</strong> - When light bounces off surfaces like mirrors</li>
+                    </ul>
+                    
+                    <h3>Sound:</h3>
+                    <ul>
+                        <li><strong>Sources of sound</strong> - Voices, instruments, animals</li>
+                        <li><strong>Vibrations</strong> - When things shake quickly to make sound</li>
+                    </ul>
+                    
+                    <p>Light helps us see things around us. Sounds helps us hear what's happening. Both can be loud or soft, bright or dim.</p>
+                `,
+                questions: [
+                    {
+                        q: "What is the biggest source of natural light?",
+                        a: "The sun"
+                    },
+                    {
+                        q: "What creates a shadow?",
+                        a: "When something blocks light"
+                    },
+                    {
+                        q: "What happens when light hits a mirror?",
+                        a: "It reflects (bounces back)"
+                    },
+                    {
+                        q: "What causes sound?",
+                        a: "Vibrations"
+                    },
+                    {
+                        q: "Can you see without light?",
+                        a: "No"
+                    },
+                    {
+                        q: "Name a source of sound from nature.",
+                        a: "Birds singing, wind blowing, water flowing"
+                    },
+                    {
+                        q: "What happens when you pluck a rubber band?",
+                        a: "It vibrates and makes a sound"
+                    },
+                    {
+                        q: "Do shadows have color?",
+                        a: "No, shadows are dark"
+                    },
+                    {
+                        q: "Can light travel through windows?",
+                        a: "Yes, light can pass through glass"
+                    },
+                    {
+                        q: "What makes a drum create sound?",
+                        a: "When it's hit, the drum skin vibrates"
+                    }
+                ]
+            }
+        };
+
+        function showExplanation() {
+            const topic = document.getElementById('topicSelect').value;
+            const explanationDiv = document.getElementById('explanation');
+            const quizDiv = document.getElementById('quiz');
+            
+            if (!topic) {
+                explanationDiv.innerHTML = '<p>Please select a topic to learn about.</p>';
+                quizDiv.style.display = 'none';
+                return;
+            }
+            
+            explanationDiv.innerHTML = content[topic].explanation;
+            explanationDiv.style.display = 'block';
+            quizDiv.style.display = 'none';
+        }
+
+        function showQuiz() {
+            const topic = document.getElementById('topicSelect').value;
+            const explanationDiv = document.getElementById('explanation');
+            const quizDiv = document.getElementById('quiz');
+            
+            if (!topic) {
+                quizDiv.innerHTML = '<p>Please select a topic to take a quiz.</p>';
+                explanationDiv.style.display = 'none';
+                quizDiv.style.display = 'block';
+                return;
+            }
+            
+            const questions = content[topic].questions;
+            let quizHTML = '<h2>Quiz Time! 📝</h2>';
+            
+            questions.forEach((item, index) => {
+                quizHTML += `
+                    <div class="question">
+                        <p><strong>Question ${index + 1}:</strong> ${item.q}</p>
+                        <button class="show-answer" onclick="showAnswer(${index})">Show Answer</button>
+                        <div id="answer-${index}" class="hidden-answer">
+                            <strong>Answer:</strong> ${item.a}
+                        </div>
+                    </div>
+                `;
+            });
+            
+            quizDiv.innerHTML = quizHTML;
+            explanationDiv.style.display = 'none';
+            quizDiv.style.display = 'block';
+        }
+
+        function showAnswer(index) {
+            const answerDiv = document.getElementById(`answer-${index}`);
+            answerDiv.style.display = 'block';
+        }
+
+res.header("Access-Control-Allow-Credentials", "true");
+        // Initialize
+        document.getElementById('explanation').innerHTML = '<p>Welcome! Choose a topic and then click "Learn About It" to read explanations or "Take a Quiz" to test your knowledge.</p>';
+    </script>
+</body>
+</html>
