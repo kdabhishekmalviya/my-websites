@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Grade 2 Math Worksheet Generator</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy:    #1a3a5c;
+    --coral:   #ff6b6b;
+    --mint:    #51cf66;
+    --sun:     #ffd43b;
+    --lavender:#845ef7;
+    --shadow:  0 4px 20px rgba(26,58,92,0.12);
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: linear-gradient(135deg, #e8f4fd 0%, #f3e8ff 50%, #fff3e8 100%);
+    min-height: 100vh;
+    color: #2d3436;
+  }
+
+  /* ── SCREEN UI ── */
+  .screen-ui {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 40px 20px 60px;
+  }
+
+  .screen-ui h1 {
+    font-family: 'Fredoka One', cursive;
+    font-size: 2.6rem;
+    color: var(--navy);
+    letter-spacing: 1px;
+    text-align: center;
+    margin-bottom: 6px;
+  }
+  .screen-ui h1 span { color: var(--coral); }
+
+  .subtitle {
+    font-size: 1rem;
+    color: #636e72;
+    margin-bottom: 36px;
+    font-weight: 600;
+    text-align: center;
+  }
+
+  .btn-group { display: flex; gap: 16px; flex-wrap: wrap; justify-content: center; }
+
+  .btn {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.15rem;
+    padding: 14px 36px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: transform 0.15s, box-shadow 0.15s;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+  }
+  .btn:hover  { transform: translateY(-3px); box-shadow: 0 8px 22px rgba(0,0,0,0.2); }
+  .btn:active { transform: translateY(0); }
+  .btn-generate { background: var(--coral); color: #fff; }
+  .btn-print    { background: var(--navy); color: #fff; display: none; }
+
+  .preview-wrap {
+    margin-top: 36px;
+    width: 100%;
+    max-width: 900px;
+    background: #fff;
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+    padding: 36px 40px;
+    display: none;
+  }
+
+  /* ── WORKSHEET CONTENT ── */
+  .ws-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    border-bottom: 3px solid var(--navy);
+    padding-bottom: 14px;
+    margin-bottom: 24px;
+  }
+  .ws-header .brand {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.55rem;
+    color: var(--navy);
+    line-height: 1;
+  }
+  .ws-header .brand span { color: var(--coral); }
+  .ws-header .meta {
+    text-align: right;
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #636e72;
+    line-height: 1.8;
+  }
+  .ws-header .meta .date-line {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 6px;
+  }
+  .ws-header .meta .date-box {
+    display: inline-block;
+    width: 130px;
+    border-bottom: 2px solid var(--navy);
+    height: 18px;
+  }
+
+  .section-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.1rem;
+    color: #fff;
+    padding: 6px 18px;
+    border-radius: 30px;
+    display: inline-block;
+    margin-bottom: 14px;
+  }
+  .sec-add { background: var(--coral); }
+  .sec-sub { background: var(--lavender); }
+  .sec-mul { background: var(--mint);    color: var(--navy) !important; }
+  .sec-div { background: var(--sun);     color: var(--navy) !important; }
+
+  .qs-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 10px 14px;
+    margin-bottom: 20px;
+  }
+
+  .q-card {
+    border: 2px solid #dee2e6;
+    border-radius: 10px;
+    padding: 10px 12px 28px;
+    min-height: 90px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    font-family: 'Nunito', sans-serif;
+    font-weight: 800;
+    font-size: 1.1rem;
+    position: relative;
+    background: #fafafa;
+  }
+  .q-card .q-num {
+    position: absolute;
+    top: 5px; left: 8px;
+    font-size: 0.68rem;
+    font-weight: 700;
+    color: #adb5bd;
+  }
+  .q-card .operands { line-height: 1.55; text-align: right; }
+  .q-card .op-symbol { color: var(--coral); margin-right: 2px; font-weight: 900; }
+  .q-card .answer-line {
+    width: 100%;
+    border-top: 2.5px solid var(--navy);
+    margin-top: 4px;
+  }
+
+  /* ── PRINT STYLES ── */
+  @media print {
+    @page { size: A4 portrait; margin: 0; }
+
+    html, body {
+      width: 210mm;
+      height: 297mm;
+      overflow: hidden;
+      background: #fff !important;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .screen-ui > h1,
+    .screen-ui > .subtitle,
+    .btn-group { display: none !important; }
+
+    .screen-ui { padding: 0 !important; display: block !important; }
+
+    /* Scale the whole worksheet to fit A4 exactly */
+    .preview-wrap {
+      display: block !important;
+      box-shadow: none !important;
+      border-radius: 0 !important;
+      margin: 0 !important;
+      /* 210mm @ 96dpi = ~794px; use 760px content width and scale to fit */
+      width: 760px !important;
+      max-width: 760px !important;
+      padding: 18px 22px !important;
+      transform-origin: top left;
+      /* (794px usable) / (760px + 44px padding) ≈ scale so total height fits 297mm */
+      transform: scale(0.98);
+    }
+
+    .ws-header {
+      padding-bottom: 8px;
+      margin-bottom: 12px;
+      border-bottom-width: 2px;
+    }
+    .ws-header .brand { font-size: 1.2rem; }
+    .ws-header .meta  { font-size: 0.74rem; line-height: 1.6; }
+    .ws-header .meta .date-box { width: 110px; height: 14px; }
+
+    .qs-section { margin-bottom: 0; }
+
+    .section-title {
+      font-size: 0.78rem;
+      padding: 3px 13px;
+      margin-bottom: 6px;
+      -webkit-print-color-adjust: exact;
+      print-color-adjust: exact;
+    }
+
+    .qs-grid {
+      grid-template-columns: repeat(5, 1fr);
+      gap: 5px 8px;
+      margin-bottom: 7px;
+    }
+
+    .q-card {
+      min-height: 60px !important;
+      height: 60px !important;
+      padding: 5px 9px 14px !important;
+      font-size: 0.9rem;
+      border-width: 1.5px;
+      border-radius: 6px;
+      background: #fff !important;
+    }
+    .q-card .q-num     { font-size: 0.58rem; }
+    .q-card .operands  { line-height: 1.4; }
+    .q-card .answer-line { margin-top: 2px; border-top-width: 1.5px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="screen-ui">
+  <h1>🧮 Grade 2 <span>Math</span> Worksheet</h1>
+  <p class="subtitle">40 questions · Addition · Subtraction · Multiplication · Division</p>
+
+  <div class="btn-group">
+    <button class="btn btn-generate" onclick="generate()">✨ Generate</button>
+    <button class="btn btn-print" id="printBtn" onclick="window.print()">🖨️ Print</button>
+  </div>
+
+  <div class="preview-wrap" id="preview">
+    <div class="ws-header">
+      <div class="brand">
+        Kanishka <span>Malviya</span><br>
+        <small style="font-size:0.7rem;color:#636e72;font-family:'Nunito',sans-serif;font-weight:700;">Grade 2 · Math Practice</small>
+      </div>
+      <div class="meta">
+        <div class="date-line">Date:&nbsp;<span class="date-box"></span></div>
+        <div>Score: _______ / 40</div>
+      </div>
+    </div>
+    <div id="ws-body"></div>
+  </div>
+</div>
+
+<script>
+function rand(min, max) {
+  return Math.floor(Math.random() * (max - min + 1)) + min;
+}
+
+function generate() {
+  const sections = [
+    {
+      label: '➕ Addition', cls: 'sec-add',
+      questions: Array.from({length:10}, () => {
+        const a = rand(100, 999), b = rand(100, Math.min(999, 1998 - a));
+        return { top: a, bottom: b, sym: '+' };
+      })
+    },
+    {
+      label: '➖ Subtraction', cls: 'sec-sub',
+      questions: Array.from({length:10}, () => {
+        const a = rand(200, 999), b = rand(100, a);
+        return { top: a, bottom: b, sym: '−' };
+      })
+    },
+    {
+      label: '✖️ Multiplication', cls: 'sec-mul',
+      questions: Array.from({length:10}, () => {
+        const a = rand(2, 12), b = rand(2, 12);
+        return { top: a, bottom: b, sym: '×' };
+      })
+    },
+    {
+      label: '➗ Division', cls: 'sec-div',
+      questions: Array.from({length:10}, () => {
+        const b = rand(2, 9), ans = rand(2, 10);
+        return { top: b * ans, bottom: b, sym: '÷' };
+      })
+    }
+  ];
+
+  let html = '';
+  sections.forEach(sec => {
+    html += `<div class="qs-section">
+      <div class="section-title ${sec.cls}">${sec.label}</div>
+      <div class="qs-grid">`;
+    sec.questions.forEach((q, i) => {
+      html += `<div class="q-card">
+        <span class="q-num">${i+1}</span>
+        <div class="operands">
+          <div>${q.top}</div>
+          <div><span class="op-symbol">${q.sym}</span>${q.bottom}</div>
+        </div>
+        <div class="answer-line"></div>
+      </div>`;
+    });
+    html += `</div></div>`;
+  });
+
+  document.getElementById('ws-body').innerHTML = html;
+  document.getElementById('preview').style.display = 'block';
+  document.getElementById('printBtn').style.display = 'inline-block';
+}
+</script>
+</body>
+</html>
